@@ -41,4 +41,28 @@ public class BotService {
     public boolean isAskingName(Long chatId) {
         return askingName.getOrDefault(chatId, false);
     }
+
+    public void handleUpdate(Map<String, Object> update) {
+        if (update.containsKey("message")) {
+            Map<String, Object> message = (Map<String, Object>) update.get("message");
+            Map<String, Object> chat = (Map<String, Object>) message.get("chat");
+            Long chatId = ((Number) chat.get("id")).longValue();
+            String text = (String) message.get("text");
+
+            // Tu lógica existente para procesar el mensaje
+            if (text.equalsIgnoreCase("/start")) {
+                sendTelegramMessage(chatId, "¡Bienvenido! ¿Cómo te llamas?");
+                setAskingName(chatId, true);  // Pregunta el nombre
+            } else if (isAskingName(chatId)) {
+                setUserName(chatId, text);  // Guarda el nombre del usuario
+                sendTelegramMessage(chatId, "¡Gracias! Tu nombre ha sido guardado.");
+                setAskingName(chatId, false);  // Ha respondido con el nombre
+            } else {
+                String response = getUserName(chatId);
+                sendTelegramMessage(chatId, response);
+            }
+        } else {
+            System.out.println("La actualización no contiene un mensaje válido.");
+        }
+    }
 }
