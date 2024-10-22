@@ -5,7 +5,7 @@ services:
     image: telegram-app-1
     build: .
     ports:
-      - "443:80"  # Cambia este puerto al 80 o 443
+      - "8084:80" # Mapea el puerto 8081 del host al 8080 del contenedor
     networks:
       - red-external-network
     restart: always
