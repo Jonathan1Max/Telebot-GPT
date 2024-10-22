@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  telegram-java:
+    image: telegram-app-1
+    build: .
+    ports:
+      - "8081:80"
+    networks:
+      - red-external-network
+    restart: always
+
+networks:
+  red-external-network:
+    external: true
