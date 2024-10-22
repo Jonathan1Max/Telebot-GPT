@@ -5,7 +5,7 @@ services:
     image: telegram-app-1
     build: .
     ports:
-      - "8081:80"
+      - "8081:80" # Mapea el puerto 8081 del host al 8080 del contenedor
     networks:
       - red-external-network
     restart: always

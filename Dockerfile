@@ -11,4 +11,4 @@ COPY target/tu-app.jar /app/tu-app.jar
 ENTRYPOINT ["java", "-jar", "/app/tu-app.jar"]
 
 # Exponer el puerto que la aplicación va a utilizar
-EXPOSE 80
+EXPOSE 8080
