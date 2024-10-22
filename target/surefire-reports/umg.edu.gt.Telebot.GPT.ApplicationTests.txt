@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: umg.edu.gt.Telebot.GPT.ApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.335 s -- in umg.edu.gt.Telebot.GPT.ApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.930 s -- in umg.edu.gt.Telebot.GPT.ApplicationTests
