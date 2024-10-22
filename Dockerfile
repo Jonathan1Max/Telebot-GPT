@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-alpine
 WORKDIR /app
 
 # Copiar el archivo JAR al contenedor
-COPY target/tu-app.jar /app/tu-app.jar
+COPY target/Telebot.GPT-0.0.1-SNAPSHOT.jar /app/tu-app.jar
 
 # Comando para ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "/app/tu-app.jar"]
