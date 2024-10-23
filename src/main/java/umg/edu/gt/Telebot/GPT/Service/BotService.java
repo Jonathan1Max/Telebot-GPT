@@ -61,6 +61,7 @@ public class BotService {
                 // Si se encuentra el cliente, enviamos el mensaje con su nombre
                 sendTelegramMessage(chatId, "¡Hola " + client.getName() + ", en qué te puedo ayudar hoy?");
             } else {
+
                 // Si no se encuentra el chatId, seguimos el proceso para preguntar y guardar el nombre
                 if (text.equalsIgnoreCase("/start")) {
                     sendTelegramMessage(chatId, "¡Bienvenido! ¿Cómo te llamas?");
