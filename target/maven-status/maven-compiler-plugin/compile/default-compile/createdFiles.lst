@@ -1,6 +1,10 @@
+umg\edu\gt\Telebot\GPT\Model\Client.class
 umg\edu\gt\Telebot\GPT\Service\BotService.class
+umg\edu\gt\Telebot\GPT\Model\User.class
+umg\edu\gt\Telebot\GPT\Service\TelegramPollingService.class
 umg\edu\gt\Telebot\GPT\Config\JPAConfig.class
 umg\edu\gt\Telebot\GPT\Repository\IBotRepository.class
 umg\edu\gt\Telebot\GPT\BotApp.class
-umg\edu\gt\Telebot\GPT\Model\Bot.class
+umg\edu\gt\Telebot\GPT\Repository\ClientRepository.class
 umg\edu\gt\Telebot\GPT\Controller\BotController.class
+umg\edu\gt\Telebot\GPT\Service\CommandHandler.class
