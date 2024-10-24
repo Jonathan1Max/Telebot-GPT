@@ -9,6 +9,7 @@ import umg.edu.gt.Telebot.GPT.Repository.ClientRepository;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 public class BotService {
@@ -21,6 +22,13 @@ public class BotService {
     // Mapa para almacenar el nombre del usuario por chatId
     private Map<Long, String> userNames = new HashMap<>();
 
+    private final CommandHandler commandHandler;
+    
+    @Autowired
+    public BotService(CommandHandler commandHandler) {
+        this.commandHandler = commandHandler;
+    }
+    
     /*private final RestTemplate restTemplate; // Campo para almacenar el RestTemplate*/
 
     // Constructor que acepta RestTemplate
@@ -65,7 +73,7 @@ public class BotService {
             Map<String, Object> chat = (Map<String, Object>) message.get("chat");
             long chatId = ((Number) chat.get("id")).longValue();  // Asegúrate de usar long para chatId
             String text = (String) message.get("text");
-
+            
             // Primero intentamos buscar si el chatId ya existe en la base de datos
             Client client = ClientRepository.getById(chatId);
 
@@ -99,16 +107,25 @@ public class BotService {
                     sendTelegramMessage(chatId, response);
                 }
             }
+            
+            // Llamar al commandHandler para manejar el comando si es que comienza con '/'
+            if (text.startsWith("/")) {
+                commandHandler.handleCommand(text, chatId, this);
+            } else {
+                // Lógica existente para manejar la entrada del usuario
+                if (isAskingName(chatId)) {
+                    setUserName(chatId, text);
+                    ClientRepository.add(text, chatId);
+                    sendTelegramMessage(chatId, "¡Gracias! Tu nombre ha sido guardado.");
+                    setAskingName(chatId, false);  // Termina de preguntar el nombre
+                } else {
+                    String response = getUserName(chatId);
+                    sendTelegramMessage(chatId, response);
+                }
+            }
         } else {
             System.out.println("La actualización no contiene un mensaje válido.");
         }
     }
-    
-    public void sendTelegramKeyboard(Long chatId, String message) {
-    RestTemplate restTemplate = new RestTemplate();
-        String url = TELEGRAM_API_URL + "?chat_id=" + chatId + "&text=" + message + 
-            "&reply_markup={\"inline_keyboard\":[[{\"text\":\"Opción 1\",\"callback_data\":\"opcion1\"},{\"text\":\"Opción 2\",\"callback_data\":\"opcion2\"}]]]}";
-        restTemplate.getForObject(url, String.class);
-    }
-
 }
+
