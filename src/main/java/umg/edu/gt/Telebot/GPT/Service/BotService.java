@@ -21,12 +21,12 @@ public class BotService {
     // Mapa para almacenar el nombre del usuario por chatId
     private Map<Long, String> userNames = new HashMap<>();
 
-    private final RestTemplate restTemplate; // Campo para almacenar el RestTemplate
+    /*private final RestTemplate restTemplate; // Campo para almacenar el RestTemplate*/
 
     // Constructor que acepta RestTemplate
-    public BotService(RestTemplate restTemplate) {
+    /*public BotService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-    }
+    }*/
     
     // metodo para enviar un mensaje a Telegram
     public void sendTelegramMessage(Long chatId, String message) {
@@ -36,9 +36,9 @@ public class BotService {
     }
     
     // Método para obtener el token por medio de protected, para las pruebas unitarias
-    public String getBotToken() {
+    /*public String getBotToken() {
         return BOT_TOKEN;
-    }
+    }*/
 
     // metodo para establecer el nombre del usuario
     public void setUserName(Long chatId, String name) {

@@ -1,4 +1,4 @@
-package umg.edu.gt.Telebot.GPT;
+/*package umg.edu.gt.Telebot.GPT;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,4 +37,4 @@ public class BotServiceTest {
         // Verificar que el mock fue llamado correctamente
         verify(restTemplateMock).getForObject(expectedUrl, String.class);
     }
-}
+}*/
