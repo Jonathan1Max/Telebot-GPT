@@ -5,11 +5,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import umg.edu.gt.Telebot.GPT.Model.Client;
 import umg.edu.gt.Telebot.GPT.Repository.ClientRepository;
+import umg.edu.gt.Telebot.GPT.Model.Question;
+import umg.edu.gt.Telebot.GPT.Repository.QuestionRepository;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+
 
 @Service
 public class BotService {
@@ -25,16 +29,12 @@ public class BotService {
     private final CommandHandler commandHandler;
     
     @Autowired
+    private QuestionRepository questionRepository;
+    
+    @Autowired
     public BotService(CommandHandler commandHandler) {
         this.commandHandler = commandHandler;
     }
-    
-    /*private final RestTemplate restTemplate; // Campo para almacenar el RestTemplate*/
-
-    // Constructor que acepta RestTemplate
-    /*public BotService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }*/
     
     // metodo para enviar un mensaje a Telegram
     public void sendTelegramMessage(Long chatId, String message) {
@@ -43,11 +43,6 @@ public class BotService {
         restTemplate.getForObject(url, String.class);
     }
     
-    // Método para obtener el token por medio de protected, para las pruebas unitarias
-    /*public String getBotToken() {
-        return BOT_TOKEN;
-    }*/
-
     // metodo para establecer el nombre del usuario
     public void setUserName(Long chatId, String name) {
         userNames.put(chatId, name);
@@ -126,6 +121,31 @@ public class BotService {
         } else {
             System.out.println("La actualización no contiene un mensaje válido.");
         }
+    }
+        private void handleQuestion(Long chatId, String questionText) {
+        Optional<Question> existingQuestion = questionRepository.findByQuestion(questionText);
+
+        if (existingQuestion.isPresent()) {
+            sendTelegramMessage(chatId, existingQuestion.get().getResponse());
+        } else {
+            String generatedResponse = generateResponseForQuestion(questionText);
+            saveQuestionResponse(questionText, generatedResponse);
+            sendTelegramMessage(chatId, generatedResponse);
+        }
+    }
+        
+
+    private String generateResponseForQuestion(String questionText) {
+        // Aquí llamas a ChatGPT o generas una respuesta para la pregunta
+        // Vamos a simular la respuesta para este ejemplo
+        return "Esta es una respuesta generada para: " + questionText;
+    }
+
+    public void saveQuestionResponse(String question, String response) {
+        Question newQuestion = new Question();
+        newQuestion.setQuestion(question);
+        newQuestion.setResponse(response);
+        questionRepository.save(newQuestion);
     }
 }
 
