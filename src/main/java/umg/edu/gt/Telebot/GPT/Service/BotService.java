@@ -5,29 +5,44 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import umg.edu.gt.Telebot.GPT.Model.Client;
 import umg.edu.gt.Telebot.GPT.Repository.ClientRepository;
+import umg.edu.gt.Telebot.GPT.Model.Question;
+import umg.edu.gt.Telebot.GPT.Repository.QuestionRepository;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 @Service
 public class BotService {
 
     private final String BOT_TOKEN = "7822338733:AAH3RJF87rr4QmkqRvjpIlUiZYhHS8zBTaQ"; // Reemplaza con tu token
     private final String TELEGRAM_API_URL = "https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage";
-
+    
     // Mapa para almacenar el estado de si se está preguntando el nombre al usuario
     private Map<Long, Boolean> askingName = new HashMap<>();
     // Mapa para almacenar el nombre del usuario por chatId
     private Map<Long, String> userNames = new HashMap<>();
 
+    private final CommandHandler commandHandler;
+    
+    @Autowired
+    private QuestionRepository questionRepository;
+    
+    @Autowired
+    public BotService(CommandHandler commandHandler) {
+        this.commandHandler = commandHandler;
+    }
+    
     // metodo para enviar un mensaje a Telegram
     public void sendTelegramMessage(Long chatId, String message) {
         RestTemplate restTemplate = new RestTemplate();
         String url = TELEGRAM_API_URL + "?chat_id=" + chatId + "&text=" + message;
         restTemplate.getForObject(url, String.class);
     }
-
+    
     // metodo para establecer el nombre del usuario
     public void setUserName(Long chatId, String name) {
         userNames.put(chatId, name);
@@ -53,7 +68,7 @@ public class BotService {
             Map<String, Object> chat = (Map<String, Object>) message.get("chat");
             long chatId = ((Number) chat.get("id")).longValue();  // Asegúrate de usar long para chatId
             String text = (String) message.get("text");
-
+            
             // Primero intentamos buscar si el chatId ya existe en la base de datos
             Client client = ClientRepository.getById(chatId);
 
@@ -87,9 +102,50 @@ public class BotService {
                     sendTelegramMessage(chatId, response);
                 }
             }
+            
+            // Llamar al commandHandler para manejar el comando si es que comienza con '/'
+            if (text.startsWith("/")) {
+                commandHandler.handleCommand(text, chatId, this);
+            } else {
+                // Lógica existente para manejar la entrada del usuario
+                if (isAskingName(chatId)) {
+                    setUserName(chatId, text);
+                    ClientRepository.add(text, chatId);
+                    sendTelegramMessage(chatId, "¡Gracias! Tu nombre ha sido guardado.");
+                    setAskingName(chatId, false);  // Termina de preguntar el nombre
+                } else {
+                    String response = getUserName(chatId);
+                    sendTelegramMessage(chatId, response);
+                }
+            }
         } else {
             System.out.println("La actualización no contiene un mensaje válido.");
         }
     }
+        private void handleQuestion(Long chatId, String questionText) {
+        Optional<Question> existingQuestion = questionRepository.findByQuestion(questionText);
 
+        if (existingQuestion.isPresent()) {
+            sendTelegramMessage(chatId, existingQuestion.get().getResponse());
+        } else {
+            String generatedResponse = generateResponseForQuestion(questionText);
+            saveQuestionResponse(questionText, generatedResponse);
+            sendTelegramMessage(chatId, generatedResponse);
+        }
+    }
+        
+
+    private String generateResponseForQuestion(String questionText) {
+        // Aquí llamas a ChatGPT o generas una respuesta para la pregunta
+        // Vamos a simular la respuesta para este ejemplo
+        return "Esta es una respuesta generada para: " + questionText;
+    }
+
+    public void saveQuestionResponse(String question, String response) {
+        Question newQuestion = new Question();
+        newQuestion.setQuestion(question);
+        newQuestion.setResponse(response);
+        questionRepository.save(newQuestion);
+    }
 }
+
